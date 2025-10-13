@@ -107,7 +107,7 @@
           <tr data-banner-id="{{ banner.id }}">
             <td>{{ banner.title }}</td>
             {% if banner.banner_image %}
-            <td><img src="{{ banner.banner_image.url }}" alt="no image" height="100px" width="100px"></td>
+            <td><img src="{{ banner.banner_image.url }}" loading="lazy" decoding="async" alt="no image" height="100px" width="100px"></td>
             {% else  %}
             <td>No image</td>
             {% endif %}
@@ -120,6 +120,7 @@
          class="dropdown-toggle"
          data-bs-toggle="dropdown"
          aria-expanded="false"
+         loading="lazy" decoding="async"
          style="cursor: pointer; width: 20px;">
          
     <ul class="dropdown-menu">
@@ -265,12 +266,12 @@ if (addbannerForm) {
         const row = document.createElement('tr');
         row.innerHTML = `
           <td>${data.title}</td>
-          <td>${data.banner_image ? `<img src="${data.banner_image}" alt="no image" height="100px" width="100px">` : 'No image'}</td>
+          <td>${data.banner_image ? `<img src="${data.banner_image}" loading="lazy" decoding="async" alt="no image" height="100px" width="100px">` : 'No image'}</td>
           <td>${data.section}</td>
           <td>${data.created_at}</td>
           <td>
             <div class="dropdown">
-              <img src="{% static 'images2/settings.png' %}" class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer; width: 20px;">
+              <img src="{% static 'images2/settings.png' %}" loading="lazy" decoding="async" class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer; width: 20px;">
               <ul class="dropdown-menu">
                 <li>
                   <a class="dropdown-item text-primary" href="#" data-bs-toggle="modal" data-bs-target="#editbannerModal-${data.id}" onclick="openEditbannerModal(${data.id}); return false;">✏️ Update</a>

@@ -7,7 +7,6 @@
 {% block extra_css %}
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-<link rel="stylesheet" href="{% static 'css/home.css' %}?v2" type="text/css" />
 <style>
   .custom-grid {
     display: grid;
@@ -365,7 +364,7 @@
 <div class="container-fluid px-2 px-md-3">
   {% if banner %}
     <div class="top-banner mb-4 position-relative">
-      <img src="{{ banner.banner_image.url }}" alt="{{ banner.title }}">
+      <img src="{{ banner.banner_image.url }}" alt="{{ banner.title }}" loading="lazy" decoding="async">
       <div class="banner-title-overlay position-absolute top-50 start-50 translate-middle text-white text-center">
         <h1 class="display-4 fw-bold" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.7);">{{ title }}</h1>
       </div>
@@ -419,6 +418,7 @@
                  class="product-img" 
                  alt="{{ entry.product.name }}"
                  loading="lazy"
+                 decoding="async"
                  style="object-fit:cover;"
                  {% if entry.product.image2 and entry.product.stock_status != 'Out of Stock' %}
                  onmouseover="this.src='{{ entry.product.image2.url }}'"
@@ -432,7 +432,7 @@
         <div class="addcart">
           <a href="{% url 'product_detail' entry.product.id %}" class="d-flex align-items-center" style="text-decoration: none; color: inherit;">
             <div class="cart">
-              <img src="{% static 'images2/shopping_cart.svg' %}" alt="Cart" width="24">
+              <img src="{% static 'images2/shopping_cart.svg' %}" alt="Cart" width="24" loading="lazy" decoding="async">
             </div>
             <div>Add to Cart</div>
           </a>

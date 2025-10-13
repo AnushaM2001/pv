@@ -151,7 +151,7 @@ document.addEventListener("DOMContentLoaded", function () {
     <!-- Sidebar -->
     <div class="col-md-2 sidebar">
       <div class="text-center mb-4">
-        <img src="{% static 'images2/hi1.png' %}" class="img-fluid" style="width:100px; height: 100px; padding: 16px 12px;" >
+        <img src="{% static 'images2/hi1.png' %}" loading="lazy" decoding="async" class="img-fluid" style="width:100px; height: 100px; padding: 16px 12px;" >
       </div>
      <a href="{% url 'admin_dashboard' %}" class="{% if request.path == '/' %}active{% endif %}">
   <i class="bi bi-house me-2"></i> Dashboard
@@ -259,7 +259,7 @@ document.addEventListener("DOMContentLoaded", function () {
    data-bs-toggle="dropdown" 
    role="button" 
    aria-expanded="false">
-  <img src="{{ logged_in_admin.profile_pic.url }}" class="rounded-circle me-4" width="50" height="50" alt="Admin" />
+  <img src="{{ logged_in_admin.profile_pic.url }}" loading="lazy" decoding="async" class="rounded-circle me-4" width="50" height="50" alt="Admin" />
   <span class="text-dark fw-semibold">{{ logged_in_admin.name }}</span>
 </a>
 

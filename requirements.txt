@@ -21,3 +21,4 @@ xhtml2pdf==0.2.7
 reportlab==3.6.12
 whitenoise==6.9.0
 mysqlclient
+django-compressor

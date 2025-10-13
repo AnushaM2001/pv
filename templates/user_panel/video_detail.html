@@ -153,7 +153,7 @@
         {% for product in related_products %}
           <div class="product" data-video-url="{{ video.video.url }}">
             {% if product.image1 %}
-              <img src="{{ product.image1.url }}" alt="{{ product.name }}">
+              <img src="{{ product.image1.url }}" alt="{{ product.name }}" loading="lazy" decoding="async">
             {% endif %}
             <h4>{{ product.name }}</h4>
             <p>Rs. {{ product.original_price }}</p>

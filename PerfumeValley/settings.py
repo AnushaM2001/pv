@@ -45,6 +45,10 @@ ALLOWED_HOSTS = ["perfumevalleyworld.com","www.perfumevalleyworld.com","127.0.0.
 
 X_FRAME_OPTIONS = 'ALLOWALL'
 
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=31536000, public',
+}
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -63,6 +67,13 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_bootstrap5',
     'storages',
+    'compressor'
+]
+
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder',
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
@@ -79,10 +90,9 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'user_panel.middleware.BlockedUserMiddleware',  
 ]
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-WHITENOISE_USE_FINDERS = True  # To find static files from STATICFILES_DIRS in dev
-WHITENOISE_MAX_AGE = 31536000
+
+
 ROOT_URLCONF = 'PerfumeValley.urls'
 
 TEMPLATES = [
@@ -168,6 +178,7 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760
 CSRF_TRUSTED_ORIGINS = [
     "https://perfumevalleyworld.com",
     "https://www.perfumevalleyworld.com",
+    
 ]
 
 
@@ -184,14 +195,36 @@ import os
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# # Optional: during development
 
-# URL to access sta
+
+
+# -----------------------------
+# STATIC FILES + COMPRESSOR SETTINGS
+# -----------------------------
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # collectstatic puts files here
-
-# Optional: during development
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# Django Compressor
+COMPRESS_ENABLED = True
+COMPRESS_OFFLINE = True
+COMPRESS_STORAGE = STATICFILES_STORAGE
+
+# Compress CSS & JS
+COMPRESS_CSS_FILTERS = [
+    'compressor.filters.css_default.CssAbsoluteFilter',
+    'compressor.filters.cssmin.CSSMinFilter',  # Minify CSS
+]
+COMPRESS_JS_FILTERS = [
+    'compressor.filters.jsmin.JSMinFilter',  # Minify JS
+]
+
+# WhiteNoise settings for serving static files
+WHITENOISE_USE_FINDERS = True
+WHITENOISE_MAX_AGE = 31536000
 
 
 # MEDIA_URL = '/media/'
@@ -207,7 +240,6 @@ AWS_S3_SIGNATURE_VERSION = 's3v4'
 AWS_DEFAULT_ACL = None
 AWS_S3_VERIFY = True
 AWS_QUERYSTRING_AUTH = False
-
 # Build the custom domain URL for media
 AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com"
 MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"

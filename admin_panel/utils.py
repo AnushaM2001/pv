@@ -4,6 +4,35 @@ from django.conf import settings
 from user_panel.models import *
 import datetime
 import json
+
+from PIL import Image
+from io import BytesIO
+from django.core.files.base import ContentFile
+
+def compress_image(image_field, quality=70):
+    """
+    Compress and convert an image to WebP.
+    Preserves transparency for PNGs.
+    """
+    if not image_field:
+        return image_field
+
+    img = Image.open(image_field)
+    img_io = BytesIO()
+
+    # Preserve transparency for PNGs
+    if img.mode in ("RGBA", "LA") or (img.mode == "P" and "transparency" in img.info):
+        img = img.convert("RGBA")
+    else:
+        img = img.convert("RGB")
+
+    # Save as WebP
+    img.save(img_io, format="WEBP", quality=quality, optimize=True)
+
+    # Change file name extension to .webp
+    name = image_field.name.rsplit('.', 1)[0] + ".webp"
+    return ContentFile(img_io.getvalue(), name=name)
+
        # password from your email
 
 def get_shiprocket_token():

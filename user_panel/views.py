@@ -34,6 +34,7 @@ from django.views.decorators.http import require_POST
 import redis
 import json
 from django.conf import settings
+from django.views.decorators.cache import cache_page
 
 # Initialize Redis client
 r = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
@@ -144,7 +145,7 @@ from admin_panel.models import *
 from django.http import JsonResponse
 from django.core.serializers import serialize
 import json
-
+@cache_page(60 * 15)  # 15 minutes
 def home1(request):
     products = Product.objects.all().annotate(
     average_rating=Avg('reviews__rating'),  # average out of 5

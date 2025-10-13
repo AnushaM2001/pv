@@ -5,7 +5,7 @@
 {% endblock title %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/home.css' %}?v2" type="text/css" />
+<link rel="preload" href="{% static 'css/home.css' %}" as="style" onload="this.rel='stylesheet'">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <style>
     @media (max-width: 576px) {
@@ -1531,76 +1531,6 @@ html, body {
 {% endblock extra_css %}
 
 {% block content %}
-<!-- {% if festival_offer %}
-Festival Offer Modal
-<div class="modal fade" id="festivalOfferModal" tabindex="-1" aria-labelledby="festivalOfferLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content p-4 text-white text-center"
-            style="border-radius: 20px; background: linear-gradient(45deg, #ff4e50, #f9d423); box-shadow: 0 0 40px rgba(0,0,0,0.8); animation: popIn 0.7s ease-out;">
-            <div class="modal-header border-0" style="background-color: rgba(0,0,0,0.1);">
-                <h5 class="modal-title w-100 fw-bold" id="festivalOfferLabel"
-                    style="font-size: 2rem; text-shadow: 1px 1px 3px #000;">
-                    🎊 {{ festival_offer.offer_name|upper }} 🎊
-                </h5>
-                <button type="button" class="btn-close position-absolute top-0 end-0 m-2" data-bs-dismiss="modal"
-                    aria-label="Close" style="background-color: #fff; border-radius: 50%; padding: 8px;">
-                </button>
-            </div>
-            <div class="modal-body">
-                <p class="fs-1 fw-bold" style="color: #fff; text-shadow: 2px 2px 5px #000;">
-                    🧨 {{ festival_offer.percentage }}% OFF 🧨
-                </p>
-                <p class="fs-5" style="color: #f0f0f0;">Valid till: <strong>{{ festival_offer.end_date}}</strong></p>
-                <p style="font-style: italic; color: #fff9;">Don't miss the Chance! 🎁</p>
-            </div>
-        </div>
-    </div>
-</div> -->
-
-<!-- <style>
-    @keyframes slideDown {
-        0% {
-            transform: translateY(-100%) scale(0.9);
-            opacity: 0;
-        }
-
-        100% {
-            transform: translateY(0) scale(1);
-            opacity: 1;
-        }
-    }
-
-    .modal.fade .modal-dialog {
-        transform: translateY(-100%);
-        transition: transform 0.5s ease-out, opacity 0.5s ease-out;
-    }
-
-    .modal.show .modal-dialog {
-        transform: translateY(0);
-    }
-
-    .modal-content {
-        animation: slideDown 0.7s ease-out;
-        border-radius: 20px;
-        background: linear-gradient(45deg, #ff4e50, #f9d423);
-        box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
-        text-align: center;
-        color: white;
-        border: 5px dashed white;
-    }
-</style>
-
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const modal = new bootstrap.Modal(document.getElementById('festivalOfferModal'));
-        modal.show();
-    });
-</script>
-{% endif %} -->
-
-
-
 
 
 <div id="pvHeroCarousel" class="carousel slide carousel-fade">
@@ -1624,7 +1554,7 @@ Festival Offer Modal
     {% if first_banner_no_section %}
     <div class="carousel-item active">
       <a href="{% url 'all_view' %}" class="d-block w-100 h-100">
-        <img src="{{ first_banner_no_section.banner_image.url }}" class="d-block w-100" alt="{{ first_banner_no_section.title }}">
+        <img src="{{ first_banner_no_section.banner_image.url }}" decoding="async" fetchpriority="high" class="d-block w-100" alt="{{ first_banner_no_section.title }}">
       </a>
     </div>
     {% endif %}
@@ -1632,7 +1562,7 @@ Festival Offer Modal
     {% for banner in other_banners %}
     <div class="carousel-item {% if not first_banner_no_section and forloop.first %}active{% endif %}">
       <a {% if banner.section %}href="{% url 'viewall_products' banner.section %}"{% endif %} class="d-block w-100 h-100">
-        <img src="{{ banner.banner_image.url }}" class="d-block w-100" alt="{{ banner.title }}">
+        <img src="{{ banner.banner_image.url }}" decoding="async" fetchpriority="high" class="d-block w-100" alt="{{ banner.title }}">
       </a>
     </div>
     {% endfor %}
@@ -1969,7 +1899,7 @@ Festival Offer Modal
                         <div class="circle-container me-2 mb-2">
                             <div class="clickable-circle circle" 
                                      data-url="{% url 'products_list' %}?subcategory={{ subcategory.id }}">
-                                <img src="{{ subcategory.sub_image.url }}" alt="{{ subcategory.name }}">
+                                <img src="{{ subcategory.sub_image.url }}" loading="lazy" decoding="async" alt="{{ subcategory.name }}">
                             </div>
                             <div class="arc-main"></div>
                             <div class="arc-opposite"></div>
@@ -2003,7 +1933,7 @@ Festival Offer Modal
                         {% if category.gif_file %}
                         <div class="circle-container me-2 mb-2">
                             <div class="clickable-circle circle" data-url="{% url 'products_list' %}?category={{ category.id }}">
-                                <img src="{{ category.gif_file.url }}" alt="{{ category.name }}">
+                                <img src="{{ category.gif_file.url }}" loading="lazy" decoding="async" alt="{{ category.name }}">
                             </div>
                             <div class="arc-main"></div>
                             <div class="arc-opposite"></div>
@@ -2251,7 +2181,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     <!-- Favorite Icon -->
     <div class="favorite {% if product.id in wishlist_product_ids %}active{% endif %}" data-product-id="{{ product.id }}">
-        <img src="{% static 'images2/favorite.svg' %}" alt="">
+        <img src="{% static 'images2/favorite.svg' %}" loading="lazy" decoding="async" alt="">
     </div>
 
     <!-- Product Image -->
@@ -2261,7 +2191,7 @@ document.addEventListener('DOMContentLoaded', function() {
              class="product-img "
              alt="{{ product.name }}"
              loading="lazy"
-            
+             decoding="async"
              style="object-fit:fill;"
              {% if product.stock_status != 'outofstock' %}
              onmouseover="this.src='{{ product.image2.url }}'"
@@ -2276,14 +2206,14 @@ document.addEventListener('DOMContentLoaded', function() {
         {% if product.stock_status == 'Out of Stock' %}
         <div class="d-flex align-items-center text-muted" style="pointer-events: none;">
             <div class="cart">
-                <img src="{% static 'images2/shopping_cart.svg' %}" alt="Cart">
+                <img src="{% static 'images2/shopping_cart.svg' %}" loading="lazy" decoding="async" alt="Cart">
             </div>
             <div>Out of Stock</div>
         </div>
         {% else %}
         <a href="{% url 'product_detail' product.id %}" class="d-flex align-items-center" style="text-decoration: none; color: inherit;">
             <div class="cart">
-                <img src="{% static 'images2/shopping_cart.svg' %}" alt="Cart">
+                <img src="{% static 'images2/shopping_cart.svg' %}" loading="lazy" decoding="async" alt="Cart">
             </div>
             <div>Add to Cart</div>
         </a>
@@ -2348,7 +2278,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     <!-- Favorite Icon -->
     <div class="favorite {% if i.id in wishlist_product_ids %}active{% endif %}" data-product-id="{{ i.id }}">
-        <img src="{% static 'images2/favorite.svg' %}" alt="">
+        <img src="{% static 'images2/favorite.svg' %}" loading="lazy" decoding="async" alt="">
     </div>
 
     <!-- Product Image -->
@@ -2358,7 +2288,7 @@ document.addEventListener('DOMContentLoaded', function() {
              class="product-img "
              alt="{{ i.name }}"
              loading="lazy"
-             
+             decoding="async"
              style="object-fit:fill;"
              {% if i.stock_status != 'outofstock' %}
              onmouseover="this.src='{{ i.image2.url }}'"
@@ -2373,14 +2303,14 @@ document.addEventListener('DOMContentLoaded', function() {
         {% if i.stock_status == 'Out of Stock' %}
         <div class="d-flex align-items-center text-muted" style="pointer-events: none;">
             <div class="cart">
-                <img src="{% static 'images2/shopping_cart.svg' %}" alt="Cart">
+                <img src="{% static 'images2/shopping_cart.svg' %}" loading="lazy" decoding="async" alt="Cart">
             </div>
             <div>Out of Stock</div>
         </div>
         {% else %}
         <a href="{% url 'product_detail' i.id %}" class="d-flex align-items-center" style="text-decoration: none; color: inherit;">
             <div class="cart">
-                <img src="{% static 'images2/shopping_cart.svg' %}" alt="Cart">
+                <img src="{% static 'images2/shopping_cart.svg' %}" loading="lazy" decoding="async" alt="Cart">
             </div>
             <div>Add to Cart</div>
         </a>
@@ -2459,7 +2389,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     <!-- Favorite Icon -->
     <div class="favorite {% if trend.id in wishlist_product_ids %}active{% endif %}" data-product-id="{{ trend.id }}">
-        <img src="{% static 'images2/favorite.svg' %}" alt="">
+        <img src="{% static 'images2/favorite.svg' %}" loading="lazy" decoding="async" alt="">
     </div>
 
     <!-- Product Image -->
@@ -2469,7 +2399,7 @@ document.addEventListener('DOMContentLoaded', function() {
              class="product-img "
              alt="{{ trend.name }}"
              loading="lazy"
-            
+             decoding="async"
              style="object-fit:fill;"
              {% if trend.stock_status != 'outofstock' %}
              onmouseover="this.src='{{ trend.image2.url }}'"
@@ -2484,14 +2414,14 @@ document.addEventListener('DOMContentLoaded', function() {
         {% if trend.stock_status == 'Out of Stock' %}
         <div class="d-flex align-items-center text-muted" style="pointer-events: none;">
             <div class="cart">
-                <img src="{% static 'images2/shopping_cart.svg' %}" alt="Cart">
+                <img src="{% static 'images2/shopping_cart.svg' %}" loading="lazy" decoding="async" alt="Cart">
             </div>
             <div>Out of Stock</div>
         </div>
         {% else %}
         <a href="{% url 'product_detail' trend.id %}" class="d-flex align-items-center" style="text-decoration: none; color: inherit;">
             <div class="cart">
-                <img src="{% static 'images2/shopping_cart.svg' %}" alt="Cart">
+                <img src="{% static 'images2/shopping_cart.svg' %}" loading="lazy"decoding="async" alt="Cart">
             </div>
             <div>Add to Cart</div>
         </a>
@@ -2741,7 +2671,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="circle-container me-2 mb-2">
                             <div class="clickable-circle circle" 
                                  data-url="{% url 'products_list' %}?subcategory={{ occasion.id }}">
-                                <img src="{{ occasion.sub_image.url }}" alt="{{ occasion.name }}">
+                                <img src="{{ occasion.sub_image.url }}" alt="{{ occasion.name }}" loading="lazy" decoding="async">
                             </div>
                             <div class="arc-main"></div>
                             <div class="arc-opposite"></div>
@@ -2761,22 +2691,6 @@ document.addEventListener('DOMContentLoaded', function() {
     <span class="{% if forloop.first %}active{% endif %}"></span>
     {% endfor %}
 </div>
-
-<!-- <div class="d-flex justify-content-between align-items-center w-100 px-5" style="background-color: #FBF0EF;">
-          <button class="btn custom-nav-button">
-              <img src="{% static 'images2/arrow_r (2).svg' %}">
-          </button>
-          <div class="d-flex align-items-center mt-3">
-              <div class="custom-pagination-dot4 active"></div>
-              <div class="custom-pagination-dot4"></div>
-              <div class="custom-pagination-dot4"></div>
-          </div>
-          <button class="btn custom-nav-button ">
-              <img src="{% static 'images2/arrow_r (1).svg' %}">
-          </button>
-      </div> -->
-
-
 
 <!--Why Trust Us   -->
 
@@ -2798,27 +2712,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
         <!-- Foreground items -->
         <div class="oval-item">
-            <div class="oval-img"><img src="{% static 'images2/Timer.svg' %}" alt="Person 1"></div>
+            <div class="oval-img"><img src="{% static 'images2/Timer.svg' %}" alt="Person 1" loading="lazy" decoding="async"></div>
             <p class="name-text">LONG <br>LASTING</p>
         </div>
         <div class="oval-item">
-            <div class="oval-img"><img src="{% static 'images2/Spray.svg' %}" alt="Person 1"></div>
+            <div class="oval-img"><img src="{% static 'images2/Spray.svg' %}" alt="Person 1" loading="lazy" decoding="async"></div>
             <p class="name-text">VARIETY OF <br> FRAGRANCE</p>
         </div>
         <div class="oval-item">
-            <div class="oval-img"><img src="{% static 'images2/premium quality.svg' %}" alt="Person 1"></div>
+            <div class="oval-img"><img src="{% static 'images2/premium quality.svg' %}" alt="Person 1" loading="lazy" decoding="async"></div>
             <p class="name-text">PREMIUM <br> QUALITY</p>
         </div>
         <div class="oval-item">
-            <div class="oval-img"><img src="{% static 'images2/Price tag.svg' %}" alt="Person 1"></div>
+            <div class="oval-img"><img src="{% static 'images2/Price tag.svg' %}" alt="Person 1" loading="lazy" decoding="async"></div>
             <p class="name-text">BEST IN<br> PRICE</p>
         </div>
         <div class="oval-item">
-            <div class="oval-img p-5"><img src="{% static 'images2/Frame.png' %}" alt="Person 1"></div>
+            <div class="oval-img p-5"><img src="{% static 'images2/Frame.png' %}" alt="Person 1" loading="lazy" decoding="async"></div>
             <p class="name-text">REGISTERED <br> TRADE MARK</p>
         </div>
         <div class="oval-item">
-            <div class="oval-img"><img src="{% static 'images2/Leaf.svg' %}" alt="Person 1"></div>
+            <div class="oval-img"><img src="{% static 'images2/Leaf.svg' %}" alt="Person 1" loading="lazy" decoding="async"></div>
             <p class="name-text">100%<br> VEGAN</p>
         </div>
     </div>
@@ -2850,7 +2764,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="mt-3">
                     <div class="star-rating mb-3">
                         {% for i in "12345" %}
-                            <img src="{% static 'images2/star.png' %}" alt="Star">
+                            <img src="{% static 'images2/star.png' %}" alt="Star" loading="lazy" decoding="async">
                         {% endfor %}
                     </div>
                     <h1 class="card-title">{{ review.review }}</h1>

@@ -21,7 +21,7 @@
               <div class="d-flex flex-column flex-md-row align-items-center">
                 <!-- Profile Image -->
                 <img src="{% if profile.profile_image %}{{ profile.profile_image.url }}{% else %}{% static 'images2/im1.png' %}{% endif %}"
-                    alt="User Image"
+                    alt="User Image" loading="lazy" decoding="async"
                     class="rounded-circle profile-img mb-2 mb-md-0"
                     style="width: 100px; height: 100px;">
 
@@ -148,10 +148,10 @@
                 <div class="frame">
                     <div class="profile-image position-relative">
                       <img src="{% if profile.profile_image %}{{ profile.profile_image.url }}{% else %}{% static 'images2/im1.png' %}{% endif %}" 
-                        alt="User Image" class="rounded-circle profile-img" id="preview-image">
+                        alt="User Image" class="rounded-circle profile-img" loading="lazy" decoding="async" id="preview-image">
                       <div class="edit-icon-container position-absolute" style="bottom: 0; right: 0;">
                         <label for="upload-image" style="cursor: pointer;">
-                          <img class="edit" src="{% static 'images2/edit.svg' %}" alt="Edit" style="width: 24px; height: 24px;">
+                          <img class="edit" src="{% static 'images2/edit.svg' %}" loading="lazy" decoding="async" alt="Edit" style="width: 24px; height: 24px;">
                       </label>
                       <input type="file" id="upload-image" name="profile_image" accept="image/*" style="display: none;">
                       </div>
@@ -214,11 +214,11 @@
     <div class="d-flex align-items-center justify-content-between mb-4">
       <div class="input-group" style="max-width: 70%;">
         <span class="input-group-text bg-white border-end-0" style="background-color: #FBF0EF;">
-          <img src="{% static 'images2/Search.svg' %}" alt="Search" style="width: 20px; height: 20px;">
+          <img src="{% static 'images2/Search.svg' %}" alt="Search" loading="lazy" decoding="async" style="width: 20px; height: 20px;">
         </span>
         <input type="search" class="form-control border-start-0" placeholder="Search your order here" style="background-color: #FBF0EF;">
       </div>
-      <img src="{% static 'images2/tune.svg' %}" alt="Filter" onclick="showPopup('filterPopup')" class="ms-2" style="cursor: pointer; width: 24px; height: 24px;">
+      <img src="{% static 'images2/tune.svg' %}" alt="Filter" loading="lazy" decoding="async" onclick="showPopup('filterPopup')" class="ms-2" style="cursor: pointer; width: 24px; height: 24px;">
     </div>
 
     <!-- Order Loop -->
@@ -226,7 +226,7 @@
     <div class="card p-3 mb-3 shadow-sm" onclick="showSection('expectDeliverySection-{{ order.shiprocket_order_id }}')" style="cursor: pointer;">
       <div class="d-flex align-items-start">
         <!-- Product Image -->
-        <img src="{{ order.items.first.product.image1.url }}" alt="Product Image" class="rounded" style="width: 80px; height: 80px; object-fit: cover;">
+        <img src="{{ order.items.first.product.image1.url }}" loading="lazy" decoding="async" alt="Product Image" class="rounded" style="width: 80px; height: 80px; object-fit: cover;">
         <!-- Details -->
         <div class="ms-3 w-100">
           <small>#{{ order.shiprocket_order_id }}</small>
@@ -347,7 +347,7 @@
                   <!-- Product Details -->
                    {% for item in order.items.all %}
                   <div class="col-md-6 col-12 d-flex">
-                    <img src="{{ item.product.image1.url }}" alt="Item Image" class="img-fluid expect-deliver-image me-3">
+                    <img src="{{ item.product.image1.url }}" loading="lazy" decoding="async" alt="Item Image" class="img-fluid expect-deliver-image me-3">
                     <div class="d-flex flex-column">
                       <h5 class="card-title mt-2" style="color: #0c0c0c; font-family: Jomolhari, serif; font-size: 18px;">{{ item.product.name }}</h5>
                       <p class="card-text mb-0 mt-2" style="color: #4D4D4D; font-family: Jomolhari, serif; font-size: 12px;">Brand: {{ item.product.subcategory }}</p>
@@ -698,7 +698,7 @@
 
           <!-- Wishlist Image -->
           <div class="wishlist-image-container position-relative">
-            <img src="{{ item.product.image1.url }}" alt="Item Image" class="wishlist-image img-fluid rounded-top">
+            <img src="{{ item.product.image1.url }}" loading="lazy" decoding="async" alt="Item Image" class="wishlist-image img-fluid rounded-top">
           </div>
 
           <!-- Product Info -->
@@ -721,7 +721,7 @@
       </div>
       {% empty %}
       <div class="text-center py-5">
-        <img src="https://cdn-icons-png.flaticon.com/512/4076/4076549.png" alt="Empty Wishlist"
+        <img src="https://cdn-icons-png.flaticon.com/512/4076/4076549.png" loading="lazy" decoding="async" alt="Empty Wishlist"
              style="width:120px; opacity:0.7;">
         <h6 class="mt-3 text-muted">Your wishlist is empty</h6>
       </div>
@@ -1358,7 +1358,7 @@
         <h1 class="popup-title">Update Your Profile Picture</h1>
         <div class="popup-body">
             <label for="upload-image" style="cursor: pointer;">
-                <img src="{% static 'images2/Attachment.svg' %}" alt="Edit" style="width: 30px; height: 30px;">
+                <img src="{% static 'images2/Attachment.svg' %}" loading="lazy" decoding="async" alt="Edit" style="width: 30px; height: 30px;">
             </label>
             
             <h1 class="popup-title"> upload Image</h1>

@@ -20,7 +20,7 @@
     <label for="editbannerGif" class="form-label">GIF/Image</label>
     <input type="file" class="form-control" id="editbannerGif" name="banner_image">
     {% if banner.banner_image %}
-      <img src="{{ banner.banner_image.url }}" alt="Current GIF" height="60" class="mt-2">
+      <img src="{{ banner.banner_image.url }}" loading="lazy" decoding="async" alt="Current GIF" height="60" class="mt-2">
     {% endif %}
   </div>
   <div class="modal-footer">

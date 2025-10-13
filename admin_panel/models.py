@@ -1,5 +1,3 @@
-
-
 from django.db import models
 from django.contrib.auth.models import User
 import requests
@@ -7,11 +5,27 @@ import random
 import string
 from django.utils import timezone
 from decimal import Decimal
-
-# Banner Model
-# models.py
-from django.db import models
 from django.contrib.auth.hashers import make_password, check_password
+from django.db.models.fields.files import ImageFieldFile
+# from admin_panel.utils import compress_image
+
+class AutoCompressImagesMixin(models.Model):
+    """
+    Mixin to automatically compress all ImageFields in a model on save.
+    """
+    class Meta:
+        abstract = True
+
+    def save(self, *args, **kwargs):
+        from admin_panel.utils import compress_image
+        # Loop through all fields
+        for field in self._meta.get_fields():
+            if field.get_internal_type() == 'ImageField':
+                image = getattr(self, field.name)
+                if image and isinstance(image, ImageFieldFile):
+                    compressed_image = compress_image(image)
+                    setattr(self, field.name, compressed_image)
+        super().save(*args, **kwargs)
 
 # models.py
 
@@ -27,7 +41,7 @@ class AdminUser(models.Model):
 
 
 # Category Model
-class Category(models.Model):
+class Category(AutoCompressImagesMixin,models.Model):
     name = models.CharField(max_length=255, unique=True, verbose_name="Category Name")
     created_at = models.DateTimeField(auto_now_add=True)
     banner = models.ImageField(upload_to='category_banners/', blank=True, null=True)
@@ -39,7 +53,7 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
-class Subcategory(models.Model):
+class Subcategory(AutoCompressImagesMixin,models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="subcategories")
     name = models.CharField(max_length=255, unique=True, verbose_name="Subcategory Name")
     created_at = models.DateTimeField(auto_now_add=True)
@@ -53,7 +67,7 @@ class Subcategory(models.Model):
     def __str__(self):
         return self.name
 # Example (models.py)
-class Banner(models.Model):
+class Banner(AutoCompressImagesMixin,models.Model):
     SECTION_CHOICES = [
         ('new-arrival', 'New Arrival'),
         ('trending', 'Trending'),
@@ -73,7 +87,7 @@ class Banner(models.Model):
 
 
 # Product Model
-class Product(models.Model):
+class Product(AutoCompressImagesMixin,models.Model):
     sku=models.CharField(max_length=10,unique=True, null=True, blank=True)
     name = models.CharField(max_length=255, verbose_name="Product Name")
     description = models.TextField()
@@ -153,7 +167,7 @@ class ProductVariant(models.Model):
             pass
       super().save(*args, **kwargs)
 
-class Flavour(models.Model):
+class Flavour(AutoCompressImagesMixin,models.Model):
     name = models.CharField(max_length=100)
     image = models.ImageField(upload_to='flavours/')
     created_at=models.DateTimeField(auto_now_add=True)
