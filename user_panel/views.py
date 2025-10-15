@@ -1,42 +1,48 @@
 import random
+import string
+import json
+import time
 import traceback
+from io import BytesIO
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.urls import reverse
 from django.utils.crypto import get_random_string
-from .models import Category, Subcategory, Product, Order, OrderItem, Payment, Cart
-from admin_panel.models import *
-import razorpay
-from django.http import HttpResponseNotAllowed, JsonResponse
-from django.conf import settings
-from django.views.decorators.http import require_GET
-from django.http import Http404
-from django.http import HttpResponse,HttpResponseRedirect
-from django.views.decorators.csrf import csrf_exempt
-from django.core.mail import send_mail
-from user_panel.forms import *
-from user_panel.models import *
-from django.contrib.auth import authenticate, login, logout,get_user_model
-import string
 from django.utils import timezone
-from django.template.loader import render_to_string,get_template
-from django.db.models import Min
-from django.db.models.functions import Lower
-from xhtml2pdf import pisa
-from io import BytesIO
-from django.core.mail import EmailMessage
-from decimal import Decimal
-from django.db.models import Sum
-from django.db.models import Q
-from django.views.decorators.http import require_POST
-
-import redis
-import json
+from django.template.loader import render_to_string, get_template
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, Http404, HttpResponseNotAllowed
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_GET, require_POST
 from django.conf import settings
+from django.db import transaction, IntegrityError
+from django.db.models import Sum, Q, Min, Max, Avg, Count
+from django.db.models.functions import Lower
+from django.core.mail import send_mail, EmailMessage
 from django.views.decorators.cache import cache_page
 
-# Initialize Redis client
+import razorpay
+import redis
+from xhtml2pdf import pisa
+
+from .models import Category, Subcategory, Product, Order, OrderItem, Payment, Cart, GiftSet
+from .forms import InternationalOrderForm
+from .forms import *  # If there are other forms in your module
+from user_panel.models import *
+from user_panel.forms import *
+from admin_panel.models import *
+from admin_panel.utils import create_shiprocket_order
+from admin_panel.views import notify_admins
+from admin_panel.tasks import (
+    create_shiprocket_order_task,
+    send_invoice_email_task,
+    notify_low_stock_task
+)
+from django.utils.timezone import now
+from django.contrib.auth import authenticate, login, logout, get_user_model
+from django.apps import apps
+# Redis client
 r = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
 
 def progress(request):
@@ -136,16 +142,7 @@ def blocked_user_view(request):
     return render(request, 'user_panel/blocked_user.html')
 
 
-from django.db.models.functions import Lower
-from django.db.models import Q, Min
-from django.utils import timezone
-from django.db.models import Min, Max
-from admin_panel.models import *
-
-from django.http import JsonResponse
-from django.core.serializers import serialize
-import json
-@cache_page(60 * 15)  # 15 minutes
+ # 15 minutes
 def home1(request):
     products = Product.objects.all().annotate(
     average_rating=Avg('reviews__rating'),  # average out of 5
@@ -248,9 +245,6 @@ def home1(request):
     })
 
 ##filter subcategory items ---is is shown filtered subcategories
-from django.db.models import Min
-from django.shortcuts import render, get_object_or_404
-from admin_panel.models import ProductVideo
 
 def video_detail(request, video_id):
     video = get_object_or_404(ProductVideo, id=video_id)
@@ -259,11 +253,6 @@ def video_detail(request, video_id):
         'video': video,
         'related_products': related_products,
     })
-
-
-from collections import defaultdict
-
-
 
 def all_view(request):
     letters = list("#ABCDEFGHIJKLMNOPQRSTUVWXYZ")
@@ -361,9 +350,6 @@ def filtered_products(request, category_id=None, subcategory_id=None):
 
     return render(request, 'user_panel/filtered_products.html', context)
 
-from django.db import IntegrityError, transaction
-from django.db.models import Avg,Count
-
 @login_required(login_url='email_login')
 def toggle_wishlist(request):
     if request.method == "POST":
@@ -390,10 +376,6 @@ def toggle_wishlist(request):
         return JsonResponse({"status": status})
 
     return JsonResponse({"error": "Invalid request"}, status=400)
-
-from django.http import JsonResponse
-from django.db.models import Min, Max, Avg
-from django.utils import timezone
 
 def ajax_filter_products(request):
     # --- 1️⃣ Get filters from GET ---
@@ -552,11 +534,6 @@ def ajax_filter_products(request):
     })
 
 
-
-
-from django.db.models import Avg,Count
-
-from math import floor
 
 @login_required(login_url='email_login')
 def product_detail(request, product_id):
@@ -734,12 +711,6 @@ def product_detail(request, product_id):
     })
 
 
-# 🔹 Add Product to Cart
-
-# views.py
-
-import time  # ensure this is imported at the top
-
 @login_required(login_url='email_login')
 def add_to_cart(request, product_id):
     product = get_object_or_404(Product, id=product_id)
@@ -830,9 +801,6 @@ def add_to_cart(request, product_id):
         messages.error(request, str(e))
         return redirect('product_detail', product_id=product_id)
 
-    
-from decimal import Decimal
-from django.db.models import Sum
 
 @require_POST
 @login_required
@@ -914,17 +882,6 @@ def update_cart_item(request, item_id):
             'status': 'error',
             'message': str(e)
         }, status=400)
-
-
-
-from django.views.decorators.http import require_POST
-from django.http import JsonResponse
-from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
-import redis
-import json
-
-from django.db.models import F, Sum, ExpressionWrapper, DecimalField
 
 import logging
 
@@ -1072,7 +1029,6 @@ def apply_coupon(request):
     # Stay on the same page
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
-from django.views.decorators.http import require_POST
 
 @require_POST
 @login_required(login_url='email_login')
@@ -1373,18 +1329,6 @@ def view_cart(request):
 
     return render(request, 'user_panel/cart.html', context)
 
-
-from admin_panel.utils import create_shiprocket_order
-from django.db import transaction
-from admin_panel.views import notify_admins
-
-from admin_panel.tasks import (
-    create_shiprocket_order_task,
-    send_invoice_email_task,
-    notify_low_stock_task
-)
-
-
 @csrf_exempt
 @login_required(login_url="email_login")
 def order_success(request):
@@ -1523,45 +1467,11 @@ def order_success(request):
     return redirect("view_cart")
 
 
-
-
-
-# 📝 User Registration
-def register(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        email = request.POST['email']
-        password = request.POST['password']
-        confirm_password = request.POST['confirm_password']
-
-        if password != confirm_password:
-            messages.error(request, "Passwords do not match!")
-            return redirect('register')
-
-        if User.objects.filter(username=username).exists():
-            messages.error(request, "Username already exists!")
-            return redirect('register')
-
-        user = User.objects.create_user(username=username, email=email, password=password)
-        user.save()
-        messages.success(request, "Account created successfully! Please log in.")
-        return redirect('login')
-
-    return render(request, 'user_panel/register.html')
-
-
 def user_logout(request):
     logout(request)
     messages.success(request, "Logged out successfully!")
     return redirect('email_login')
 
-
-
-
-
-from django.db.models import Q, Min, Max, Avg
-from django.views.decorators.http import require_GET
-from django.http import JsonResponse
 @require_GET
 def search_suggestions(request):
     query = request.GET.get('q', '').strip()
@@ -1625,63 +1535,6 @@ def search_suggestions(request):
         })
 
     return JsonResponse({'results': suggestions, 'categories': all_categories})
-
-
-from django.views.decorators.http import require_GET
-from django.http import JsonResponse
-from django.db.models import Q, Min, Max, Avg
-from .models import Product, GiftSet, Category
-# @require_GET
-# def search_suggestions(request):
-#     query = request.GET.get('q', '').strip()
-#     category_id = request.GET.get('category', '').strip()
-#     suggestions = []
-
-#     all_categories = list(Category.objects.all().values('id', 'name'))
-
-#     matching_products = Product.objects.all()
-
-#     if query:
-#         matching_products = matching_products.filter(
-#             Q(name__icontains=query) | Q(description__icontains=query) | Q(sku__icontains=query)
-#         )
-
-#     if category_id:
-#         matching_products = matching_products.filter(category_id=category_id)
-
-#     matching_products = matching_products.annotate(
-#         min_price=Min('variants__price'),
-#         max_price=Max('variants__price'),
-#         avg_rating=Avg('reviews__rating')
-#     )
-
-#     for product in matching_products:
-#         avg_rating = round(product.avg_rating or 0, 1)
-#         rating_percentage = round((avg_rating / 5) * 100, 1) if avg_rating else 0
-
-#         suggestions.append({
-#             'id': product.id,
-#             'name': product.name,
-#             'image': product.image1.url if product.image1 else '',
-#             'description': product.description[:100] if product.description else '',
-#             'url': f"/product/{product.id}/",
-#             'price_display': "₹{:.2f}".format(product.min_price) if product.min_price else "Price not available",
-#             'average_rating': avg_rating,
-#             'rating_percentage': rating_percentage,
-#             'original_price': getattr(product, 'original_price', None),
-#         })
-
-#     return JsonResponse({'results': suggestions, 'categories': all_categories})
-
-
-
-# {% url 'products_list' %}?category={{ category.id }}
-
-
-
-
-
-
 
 
 @login_required(login_url='email_login')
@@ -1769,7 +1622,6 @@ def viewall_products(request, section):
         
     })
 
-from .forms import InternationalOrderForm
 
 def international_order(request):
     if request.method == 'POST':
@@ -1845,11 +1697,7 @@ def update_address(request, address_id):
 
     
     
-#user_profile views
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-import time
+#user_profile vie
 
 def fetch_shiprocket_tracking(awb_code):
     """
@@ -2044,13 +1892,6 @@ def view_help_query(request, query_id):
         'admin_reply': query.admin_reply
     })
 
-
-from django.shortcuts import get_object_or_404, redirect
-from django.contrib import messages
-from django.utils.timezone import now
-from django.contrib.auth.decorators import login_required
-from django.apps import apps
-
 @login_required(login_url='email_login')
 def send_help_query_message(request, query_id):
     query = get_object_or_404(HelpQuery, id=query_id, user=request.user)
@@ -2218,13 +2059,6 @@ def shiprocket_order_result_view(request):
             }
         })
 
-
-
-
-
-
-
-
 @login_required(login_url='email_login')
 def order_tracking_view(request, order_id):
     order = get_object_or_404(Order, id=order_id, user=request.user)
@@ -2239,12 +2073,7 @@ def order_tracking_view(request, order_id):
 
     shipment_tracks = tracking.get("shipment_tracks") or tracking.get("shipment_track") or []
 
-    # if not shipment_tracks:
-    #    error = "Tracking information not available yet."
-    #    return render(request, 'user_panel/tracking.html', {'order': order, 'error': error})
-
-
-    # Safely extract first track
+   
     first_track = shipment_tracks[0] if shipment_tracks else {}
     shipment_activities = tracking.get("shipment_track_activities", [])
 
