@@ -386,9 +386,11 @@
                         <img src="{{ product.plastic_image.url }}" loading="lazy" decoding="async" class="img-fluid h-100 w-100 object-fit-cover" style="object-fit: cover;" onclick="changeMainImage(this)">
                     </div>
                     {% endif %}
+                    {% if product.image1 %}
                       <div class="overflow-hidden rounded thumb-image mb-2" style="height: 80px; width: 80px;">
                           <img   src="{{ product.image1.url }}" loading="lazy" decoding="async" class="img-fluid w-100 h-100 object-fit-fill" onclick="changeMainImage(this)" >
                     </div>
+                    {% endif %}
                 </div>
                 <style>
                   
@@ -414,9 +416,11 @@
                 }
                 </style>
                 <div class="main-image flex-grow-1 order-0 order-md-1">
+                    {% if product.image1 %}
                     <div class="overflow-hidden rounded" style="width: 100%; max-width: 450px; ">
                         <img  id="mainProductImage" src="{{ product.image1.url }}" loading="lazy" decoding="async" class="img-fluid w-100 h-100 object-fit-cover">
                     </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -434,11 +438,7 @@
                 <!-- Product Details -->
                 <div>
                     <h1 class="mb-2" style="font-family: 'Jomolhari';" >{{ product.name }}</h1>
-{% if is_giftset %}
-                    <p class="text-secondary mb-3" style="display: none;font-style: italic;">Brand : {{ product.subcategory.name }}</p>
-                    {% else %}
-                    <p class="text-secondary mb-3" style="font-style: italic;" >Brand : {{ product.subcategory.name }}</p>
-{% endif %}                    <p>SKU: {{ product.sku }}</p>
+                 <p>SKU: {{ product.sku }}</p>
  <style>
   .stars-outer {
     position: relative;
@@ -580,7 +580,7 @@
 <div class="d-flex align-items-center gap-3 mb-4">
     <h3 class="mb-0" id="gift-variant-price">₹--</h3>
     <h3 class="mb-0 text-muted text-decoration-line-through" id="gift-original-price"></h3>
-    <h3 id="nor-price" class="mb-0 text-decoration-line-through" style="display:none;">₹{{ product.original_price|floatformat:2 }}</h3>
+    <h3 id="nor-price" class="mb-0 text-decoration-line-through" style="display:none;"></h3>
     <h3 class="mb-0 text-success" id="gift-offer-discount"></h3>
 </div>
 
@@ -588,7 +588,7 @@
 <div class="d-flex align-items-center gap-2 mb-4">
     <h3 class="mb-0" id="variant-price" style="font-family: 'Jomolhari';font-size:1.4rem">₹0</h3>
     <h3 class="mb-0 text-muted text-decoration-line-through" id="original-price" style="display:none;font-size:1.1rem;font-family: 'Jomolhari';"></h3>
-    <h3 id="normal-price" class="mb-0 text-decoration-line-through" style="display:none;font-family: 'Jomolhari';">₹{{ product.original_price|floatformat:2 }}</h3>
+    <h3 id="normal-price" class="mb-0 text-decoration-line-through" style="display:none;font-family: 'Jomolhari';"></h3>
     <span class="mb-0 text-success off" id="you-save" style="margin-left: 3px;margin-right: -13rem; "></span>
     <span class="mb-0 text-success off" id="discount-percentage" style="margin-left: 8px;"></span>
 </div>
